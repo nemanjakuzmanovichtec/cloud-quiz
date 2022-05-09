@@ -1,0 +1,47 @@
+{
+  "name": "cloud-quiz",
+  "version": "1.0.0",
+  "description": "Serverless AWS Quiz Application",
+  "main": "serverless.ts",
+  "author": "HTEC Group",
+  "license": "MIT",
+  "scripts": {
+    "stack:deploy": "sls deploy --verbose --stage",
+    "function:deploy": "sls deploy function --function",
+    "stack:remove": "sls remove --stage",
+    "start:local": "sls offline --ignoreJWTSignature",
+    "test:unit": "jest --coverage",
+    "lint": "eslint '**/*.{js,ts}' --ignore-pattern node_modules/ --fix"
+  },
+  "engines": {
+    "node": ">=14.15.0"
+  },
+  "dependencies": {
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.85.0",
+    "lambda-hooks": "^0.2.1",
+    "ts-case-convert": "^2.0.2",
+    "yup": "^0.32.11"
+  },
+  "devDependencies": {
+    "@serverless/typescript": "^3.0.0",
+    "@types/aws-lambda": "^8.10.71",
+    "@types/jest": "^27.5.0",
+    "@types/node": "^14.14.25",
+    "@typescript-eslint/eslint-plugin": "^5.22.0",
+    "@typescript-eslint/parser": "^5.22.0",
+    "esbuild": "^0.14.38",
+    "eslint": "^8.14.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "jest": "^27.5.1",
+    "jest-mock-extended": "^2.0.5",
+    "prettier": "^2.6.2",
+    "serverless": "^3.0.0",
+    "serverless-esbuild": "^1.23.3",
+    "serverless-offline": "^8.7.0",
+    "ts-jest": "^27.1.4",
+    "ts-node": "^10.4.0",
+    "tsconfig-paths": "^3.9.0",
+    "typescript": "^4.1.3"
+  }
+}
