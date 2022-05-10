@@ -16,9 +16,9 @@ const CognitoResources: AWS['resources']['Resources'] = {
           RequireSymbols: false,
         },
       },
-      AdminCreateUserConfig: {
-        AllowAdminCreateUserOnly: true,
-      },
+      // AdminCreateUserConfig: {
+      //   AllowAdminCreateUserOnly: true,
+      // },
       AccountRecoverySetting: {
         RecoveryMechanisms: [
           {
@@ -34,8 +34,29 @@ const CognitoResources: AWS['resources']['Resources'] = {
     Properties: {
       ClientName: '${self:service}-user-pool-client-${sls:stage}',
       UserPoolId: { Ref: 'CognitoUserPool' },
-      ExplicitAuthFlows: ['ADMIN_NO_SRP_AUTH'],
+      CallbackURLs: [
+        '${self:custom.clientOrigins.${sls:stage}, "http://localhost:3000/callback"}',
+      ],
+      DefaultRedirectURI:
+        '${self:custom.clientOrigins.${sls:stage}, "http://localhost:3000/callback"}',
+      SupportedIdentityProviders: ['COGNITO'],
+      ExplicitAuthFlows: [
+        'ALLOW_USER_SRP_AUTH',
+        'ALLOW_USER_PASSWORD_AUTH',
+        'ALLOW_REFRESH_TOKEN_AUTH',
+      ],
       GenerateSecret: false,
+      PreventUserExistenceErrors: 'ENABLED',
+      AllowedOAuthFlowsUserPoolClient: true,
+      AllowedOAuthFlows: ['implicit'],
+      AllowedOAuthScopes: ['email', 'openid'],
+    },
+  },
+  UserPoolDomain: {
+    Type: 'AWS::Cognito::UserPoolDomain',
+    Properties: {
+      Domain: '${self:service}-${sls:stage}',
+      UserPoolId: { Ref: 'CognitoUserPool' },
     },
   },
   // CognitoIdentityPool: {

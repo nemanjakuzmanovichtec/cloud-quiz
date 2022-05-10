@@ -1,5 +1,9 @@
 import { APIGatewayRequestAuthorizerHandler } from 'aws-lambda';
+import { withApiHooks } from '@hooks/withApiHooks';
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
+import { CognitoIdTokenPayload } from 'aws-jwt-verify/jwt-model';
+
+type IdToken = CognitoIdTokenPayload & { email?: string };
 
 const UserPoolId = process.env.USER_POOL_ID;
 const AppClientId = process.env.APP_CLIENT_ID;
@@ -12,7 +16,7 @@ export const handler: APIGatewayRequestAuthorizerHandler = async (event) => {
       clientId: AppClientId,
     });
 
-    const encodedToken = event.queryStringParameters.idToken;
+    const encodedToken = event.headers.Auth;
     const payload = await verifier.verify(encodedToken);
     console.log('Token is valid. Payload:', payload);
 
@@ -39,8 +43,7 @@ const denyAllPolicy = () => {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const allowPolicy = (methodArn: string, idToken: any) => {
+const allowPolicy = (methodArn: string, idToken: IdToken) => {
   return {
     principalId: idToken.sub,
     policyDocument: {
@@ -54,8 +57,10 @@ const allowPolicy = (methodArn: string, idToken: any) => {
       ],
     },
     context: {
-      // set userId in the context
       userId: idToken.sub,
+      email: idToken.email,
     },
   };
 };
+
+export const main = withApiHooks(handler);

@@ -1,4 +1,5 @@
 import { AnyObjectSchema } from 'yup';
+import { APIGatewayRequestAuthorizerHandler } from 'aws-lambda';
 import {
   handleUnexpectedError,
   logEvent,
@@ -14,7 +15,7 @@ interface WithApiHooksConfig {
 }
 
 export const withApiHooks = (
-  lambda: APIGatewayProxyHandler,
+  lambda: APIGatewayProxyHandler | APIGatewayRequestAuthorizerHandler,
   config: WithApiHooksConfig = {}
 ) => {
   const beforeArr = [parseEvent, logEvent];

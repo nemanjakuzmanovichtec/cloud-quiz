@@ -50,8 +50,6 @@ const serverlessConfiguration: AWS = {
           ],
         ],
       },
-      USER_POOL_ID: { Ref: 'CognitoUserPool' },
-      APP_CLIENT_ID: { Ref: 'CognitoUserPoolClient' },
     },
   },
   package: { individually: true },
