@@ -1,5 +1,5 @@
 import { MockProxy, mock } from 'jest-mock-extended';
-import { handler } from '@functions/default/handler';
+import { handler } from '@functions/ws-api/default/handler';
 import { APIGatewayProxyEvent, AWSContext } from '@libs/types';
 import { OK } from '@libs/response';
 

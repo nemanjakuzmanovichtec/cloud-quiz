@@ -1,7 +1,7 @@
 import { handlerPath } from '@libs/handler-resolver';
-import { APIGatewayFunction } from '@libs/types';
+import { LambdaFunction } from '@libs/types';
 
-export const sayHelloHandler: APIGatewayFunction = {
+export const sayHelloHandler: LambdaFunction = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [{ websocket: { route: 'sayHello' } }],
 };

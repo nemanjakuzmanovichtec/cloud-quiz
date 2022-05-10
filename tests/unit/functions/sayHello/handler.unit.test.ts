@@ -1,8 +1,8 @@
 import { MockProxy, mock } from 'jest-mock-extended';
 import { APIGatewayProxyResult } from 'aws-lambda';
-import { handler } from '@functions/sayHello/handler';
+import { handler } from '@functions/ws-api/sayHello/handler';
+import { HelloBody } from '@functions/ws-api/sayHello/schema';
 import { APIGatewayProxyEvent, AWSContext } from '@libs/types';
-import { HelloBody } from '@functions/sayHello/schema';
 import { OK } from '@libs/response';
 
 import {

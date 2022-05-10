@@ -11,8 +11,6 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "strict": true,
-    "strictFunctionTypes": false,
     "outDir": "lib"
   },
   "include": [
