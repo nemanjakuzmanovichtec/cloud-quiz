@@ -20,6 +20,11 @@ type ResponseMethod = (
   body?: ResponseBody,
   headers?: ResponseHeaders
 ) => APIGatewayProxyResult;
+interface WrappedResponseBody {
+  status: ResponseStatus;
+  statusCode: ResponseCode;
+  data: ResponseBody;
+}
 
 const defaultHeaders = {
   'Content-Type': 'application/json',
@@ -31,11 +36,11 @@ const defaultHeaders = {
 
 const response = (
   statusCode: number,
-  body: ResponseBody,
+  body: WrappedResponseBody,
   headers?: ResponseHeaders
 ): APIGatewayProxyResult => ({
   statusCode,
-  body: typeof body === 'string' ? body : JSON.stringify(body),
+  body: JSON.stringify(body),
   headers: { ...defaultHeaders, ...headers },
 });
 

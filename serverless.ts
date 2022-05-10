@@ -1,5 +1,6 @@
 import type { AWS } from '@serverless/typescript';
 import * as functions from '@functions';
+import CognitoResources from 'resources/Cognito';
 
 // General
 const SERVICE_NAME = 'cloud-quiz';
@@ -25,6 +26,7 @@ const serverlessConfiguration: AWS = {
     name: PROVIDER_NAME,
     runtime: RUNTIME,
     region: REGION,
+    tags: { Project: '${self:service}', Environment: '${sls:stage}' },
     apiGateway: {
       minimumCompressionSize: 1024,
       shouldStartNameWithService: true,
@@ -65,6 +67,9 @@ const serverlessConfiguration: AWS = {
     },
   },
   functions: { ...functions },
+  resources: {
+    Resources: { ...CognitoResources },
+  },
 };
 
 module.exports = serverlessConfiguration;
