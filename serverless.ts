@@ -1,6 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 import * as functions from '@functions';
 import CognitoResources from 'resources/Cognito';
+import DynamoDBResources from 'resources/DynamoDB';
 
 // General
 const SERVICE_NAME = 'cloud-quiz';
@@ -17,6 +18,15 @@ const LOG_RETENTION_IN_DAYS = 7;
 // Websockets
 const WS_API_NAME = 'cloud-quiz-ws-api-${sls:stage}';
 const WS_API_ROUTE_SELECTION_EXPRESSION = '$request.body.action';
+
+const DynamoTableNames = () => {
+  const tableNames: { [key: string]: { Ref: string } } = {};
+  Object.keys(DynamoDBResources).map((tableName) => {
+    tableNames[tableName] = { Ref: tableName };
+  });
+
+  return tableNames;
+};
 
 const serverlessConfiguration: AWS = {
   service: SERVICE_NAME,
@@ -40,6 +50,7 @@ const serverlessConfiguration: AWS = {
     environment: {
       AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       NODE_OPTIONS: '--enable-source-maps --stack-trace-limit=1000',
+      REGION: '${self:provider.region}',
       WS_ENDPOINT: {
         'Fn::Join': [
           '',
@@ -50,10 +61,15 @@ const serverlessConfiguration: AWS = {
           ],
         ],
       },
+      ...DynamoTableNames(),
     },
   },
   package: { individually: true },
-  plugins: ['serverless-esbuild', 'serverless-offline'],
+  plugins: [
+    'serverless-esbuild',
+    'serverless-iam-roles-per-function',
+    'serverless-offline',
+  ],
   custom: {
     esbuild: {
       bundle: true,
@@ -68,7 +84,12 @@ const serverlessConfiguration: AWS = {
   },
   functions: { ...functions },
   resources: {
-    Resources: { ...CognitoResources },
+    Resources: { ...CognitoResources, ...DynamoDBResources },
+    Outputs: {
+      CognitoUserPoolId: {
+        Value: { Ref: 'CognitoUserPool' },
+      },
+    },
   },
 };
 

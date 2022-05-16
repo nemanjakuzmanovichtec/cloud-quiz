@@ -1,5 +1,5 @@
 import { handlerPath } from '@libs/handler-resolver';
-import { LambdaFunction } from '@libs/types';
+import { LambdaFunctionWithIam } from '@libs/types';
 
 type CustomCognitoAuthorizer =
   | string
@@ -10,10 +10,17 @@ const authorizer: CustomCognitoAuthorizer = {
   arn: { 'Fn::GetAtt': ['AuthorizerHandlerLambdaFunction', 'Arn'] },
 };
 
-export const connectionHandler: LambdaFunction = {
+export const connectionHandler: LambdaFunctionWithIam = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
     { websocket: { route: '$connect', authorizer } },
     { websocket: { route: '$disconnect' } },
+  ],
+  iamRoleStatements: [
+    {
+      Effect: 'Allow',
+      Action: ['dynamodb:PutItem', 'dynamodb:DeleteItem'],
+      Resource: { 'Fn::GetAtt': ['ConnectionsTable', 'Arn'] },
+    },
   ],
 };

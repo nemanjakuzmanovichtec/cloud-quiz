@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.85.0",
+    "@aws-sdk/client-dynamodb": "^3.87.0",
+    "@aws-sdk/util-dynamodb": "^3.87.0",
     "aws-jwt-verify": "^3.0.0",
     "lambda-hooks": "^0.2.1",
     "ts-case-convert": "^2.0.2",
@@ -38,7 +40,9 @@
     "jest-mock-extended": "^2.0.5",
     "prettier": "^2.6.2",
     "serverless": "^3.0.0",
+    "serverless-dynamodb-local": "^0.2.40",
     "serverless-esbuild": "^1.23.3",
+    "serverless-iam-roles-per-function": "^3.2.0-e97ab49",
     "serverless-offline": "^8.7.0",
     "ts-jest": "^27.1.4",
     "ts-node": "^10.4.0",

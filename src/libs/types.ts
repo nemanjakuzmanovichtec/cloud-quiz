@@ -4,9 +4,12 @@ import {
   APIGatewayProxyEvent as AWSEvent,
   APIGatewayProxyResult,
 } from 'aws-lambda';
-import { AWS } from '@serverless/typescript';
+import { AWS, AwsIamPolicyStatements } from '@serverless/typescript';
 
 export type LambdaFunction = AWS['functions'][''];
+export type LambdaFunctionWithIam = LambdaFunction & {
+  iamRoleStatements: AwsIamPolicyStatements;
+};
 export type AWSContext = Context;
 export type AnyObj = Record<string, unknown>;
 export type EmptyObj = Record<string, never>;
