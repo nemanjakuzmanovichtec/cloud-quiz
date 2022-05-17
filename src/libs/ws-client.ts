@@ -23,7 +23,7 @@ const makeWSClient = (configuration: ApiGatewayManagementApiClientConfig) => {
     const command = new PostToConnectionCommand(params);
 
     try {
-      return client.send(command);
+      return await client.send(command);
     } catch (error) {
       throw new Error('PostToConnectionCommand unsuccessful');
     }
@@ -43,7 +43,7 @@ const makeWSClient = (configuration: ApiGatewayManagementApiClientConfig) => {
   return { sendToOne, sendToMany };
 };
 
-const makeEndpoint = () => {
+export const makeEndpoint = () => {
   const isServerlessOffline = !!process.env.IS_OFFLINE;
   const endpoint = isServerlessOffline
     ? 'http://localhost:3001'

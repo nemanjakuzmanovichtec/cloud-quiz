@@ -3,7 +3,10 @@ import {
   PutItemCommandInput,
 } from '@aws-sdk/client-dynamodb';
 
-const sendFn = jest.fn().mockResolvedValue(null);
+const sendFn = jest
+  .fn()
+  .mockRejectedValueOnce(new Error())
+  .mockResolvedValueOnce(null);
 
 export class DynamoDBClient {
   readonly configuration: DynamoDBClientConfig;

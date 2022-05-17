@@ -6,9 +6,9 @@
   "author": "HTEC Group",
   "license": "MIT",
   "scripts": {
-    "stack:deploy": "sls deploy --verbose --stage",
-    "function:deploy": "sls deploy function --function",
-    "stack:remove": "sls remove --stage",
+    "stack:deploy": "sls deploy --verbose -s development",
+    "function:deploy": "sls deploy function -s development -f",
+    "stack:remove": "sls remove -s development",
     "start:local": "sls offline --ignoreJWTSignature",
     "test:unit": "jest --coverage",
     "lint": "eslint '**/*.{js,ts}' --ignore-pattern node_modules/ --fix"

@@ -3,7 +3,10 @@ import {
   PostToConnectionCommandInput,
 } from '@aws-sdk/client-apigatewaymanagementapi';
 
-const sendFn = jest.fn().mockResolvedValue(null);
+const sendFn = jest
+  .fn()
+  .mockRejectedValueOnce(new Error())
+  .mockResolvedValueOnce(null);
 
 export class ApiGatewayManagementApiClient {
   readonly configuration: ApiGatewayManagementApiClientConfig;

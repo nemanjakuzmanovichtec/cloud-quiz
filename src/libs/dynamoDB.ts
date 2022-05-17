@@ -1,21 +1,22 @@
 import {
   DeleteItemCommand,
   DeleteItemCommandInput,
-  DeleteItemCommandOutput,
   DynamoDBClient,
   DynamoDBClientConfig,
   PutItemCommand,
   PutItemCommandInput,
-  PutItemCommandOutput,
+  GetItemCommandInput,
+  GetItemCommand,
+  AttributeValue,
 } from '@aws-sdk/client-dynamodb';
-import { marshall } from '@aws-sdk/util-dynamodb';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 
 interface WriteInput {
   data: Record<string, unknown>;
   tableName: string;
 }
 
-interface DeleteInput {
+interface ItemInput {
   hashKey: string;
   hashValue: string;
   rangeKey?: string;
@@ -23,11 +24,13 @@ interface DeleteInput {
   tableName: string;
 }
 
+type DeleteInput = ItemInput;
+type GetInput = ItemInput;
+
 interface DynamoDB {
-  write: (
-    input: WriteInput
-  ) => Promise<Record<string, unknown>> | Promise<PutItemCommandOutput>;
-  remove: (input: DeleteInput) => Promise<DeleteItemCommandOutput>;
+  write: (input: WriteInput) => Promise<Record<string, unknown>>;
+  remove: (input: DeleteInput) => Promise<void>;
+  get: (input: GetInput) => Promise<Record<string, unknown>>;
 }
 
 const makeDynamoDB = (configuration: DynamoDBClientConfig): DynamoDB => {
@@ -66,9 +69,31 @@ const makeDynamoDB = (configuration: DynamoDBClientConfig): DynamoDB => {
     const command = new DeleteItemCommand(input);
 
     try {
-      return await client.send(command);
+      await client.send(command);
     } catch (error) {
       console.log('DB ERROR - Failed to delete from DB', error);
+    }
+  };
+
+  const get = async (getInput: GetInput) => {
+    const { hashKey, hashValue, rangeKey, rangeValue, tableName } = getInput;
+
+    const input: GetItemCommandInput = {
+      TableName: tableName,
+      Key: marshallObj({
+        [hashKey]: hashValue,
+        [rangeKey]: rangeValue,
+      }),
+    };
+
+    const command = new GetItemCommand(input);
+
+    try {
+      const output = await client.send(command);
+
+      return unmarshallObj(output.Item);
+    } catch (error) {
+      console.log('DB ERROR - Failed to get item from DB', error);
     }
   };
 
@@ -76,7 +101,11 @@ const makeDynamoDB = (configuration: DynamoDBClientConfig): DynamoDB => {
     return marshall(data, { removeUndefinedValues: true });
   };
 
-  return { write, remove };
+  const unmarshallObj = (data: { [key: string]: AttributeValue }) => {
+    return unmarshall(data);
+  };
+
+  return { write, remove, get };
 };
 
 const DynamoDB = makeDynamoDB({ region: process.env.REGION });
