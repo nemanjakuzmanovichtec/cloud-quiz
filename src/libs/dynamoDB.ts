@@ -49,7 +49,8 @@ const makeDynamoDB = (configuration: DynamoDBClientConfig): DynamoDB => {
     try {
       await client.send(command);
     } catch (error) {
-      console.log('DB ERROR - Failed to write to DB', error);
+      console.error('DB ERROR - Failed to write to DB', error);
+      throw new Error('PutItemCommand unsuccessful');
     }
 
     return data;
@@ -71,7 +72,8 @@ const makeDynamoDB = (configuration: DynamoDBClientConfig): DynamoDB => {
     try {
       await client.send(command);
     } catch (error) {
-      console.log('DB ERROR - Failed to delete from DB', error);
+      console.error('DB ERROR - Failed to delete from DB', error);
+      throw new Error('DeleteItemCommand unsuccessful');
     }
   };
 
@@ -93,7 +95,8 @@ const makeDynamoDB = (configuration: DynamoDBClientConfig): DynamoDB => {
 
       return unmarshallObj(output.Item);
     } catch (error) {
-      console.log('DB ERROR - Failed to get item from DB', error);
+      console.error('DB ERROR - Failed to get item from DB', error);
+      throw new Error('GetItemCommand unsuccessful');
     }
   };
 
