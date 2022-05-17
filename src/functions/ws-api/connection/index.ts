@@ -1,19 +1,19 @@
 import { handlerPath } from '@libs/handler-resolver';
 import { LambdaFunctionWithIam } from '@libs/types';
 
-type CustomCognitoAuthorizer =
-  | string
-  | { name: string; arn: string | { 'Fn::GetAtt': string[] } };
+// type CustomCognitoAuthorizer =
+//   | string
+//   | { name: string; arn: string | { 'Fn::GetAtt': string[] } };
 
-const authorizer: CustomCognitoAuthorizer = {
-  name: 'custom-cognito-authorizer',
-  arn: { 'Fn::GetAtt': ['AuthorizerHandlerLambdaFunction', 'Arn'] },
-};
+// const authorizer: CustomCognitoAuthorizer = {
+//   name: 'custom-cognito-authorizer',
+//   arn: { 'Fn::GetAtt': ['AuthorizerHandlerLambdaFunction', 'Arn'] },
+// };
 
 export const connectionHandler: LambdaFunctionWithIam = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
-    { websocket: { route: '$connect', authorizer } },
+    { websocket: { route: '$connect' } },
     { websocket: { route: '$disconnect' } },
   ],
   iamRoleStatements: [

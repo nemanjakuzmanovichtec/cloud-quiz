@@ -14,7 +14,7 @@
     "lint": "eslint '**/*.{js,ts}' --ignore-pattern node_modules/ --fix"
   },
   "engines": {
-    "node": ">=14.15.0"
+    "node": ">=16.15.0"
   },
   "dependencies": {
     "@aws-sdk/client-apigatewaymanagementapi": "^3.85.0",
