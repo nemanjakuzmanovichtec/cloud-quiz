@@ -1,59 +1,45 @@
 import { MockProxy, mock } from 'jest-mock-extended';
-import { APIGatewayProxyResult } from 'aws-lambda';
 import { handler } from '@functions/ws-api/sayHello/handler';
 import { HelloBody } from '@functions/ws-api/sayHello/schema';
+import { WSClient } from '@libs/ws-client';
 import { APIGatewayProxyEvent, AWSContext } from '@libs/types';
 import { OK } from '@libs/response';
 
-import {
-  ApiGatewayManagementApiClient,
-  PostToConnectionCommand,
-} from '@mocks/@aws-sdk/client-apigatewaymanagementapi';
-
-const client = new ApiGatewayManagementApiClient({});
+jest.mock('@libs/ws-client');
 
 describe('sayHello', () => {
   let event: MockProxy<APIGatewayProxyEvent<HelloBody>>;
   let context: MockProxy<AWSContext>;
-  const expectedResult: APIGatewayProxyResult = OK();
-
-  const connectionId = '123456';
 
   beforeEach(() => {
     event = mock<APIGatewayProxyEvent<HelloBody>>();
     context = mock<AWSContext>();
-
-    event.requestContext.connectionId = connectionId;
   });
 
-  it('should call client.send with PostToConnectionCommand with Hello John message', async () => {
+  it('should call sendToOne with Hello John & return OK', async () => {
     const name = 'John';
-    const command = new PostToConnectionCommand({
-      ConnectionId: connectionId,
-      Data: Buffer.from(JSON.stringify({ message: `Hello ${name}` })),
-    });
+    const connectionId = '123456';
+    const payload = { message: `Hello ${name}` };
 
     event.body = { action: 'sayHello', name };
+    event.requestContext.connectionId = connectionId;
 
     const result = await handler(event, context);
 
-    expect(command).toEqual(command);
-    expect(client.send).toHaveBeenCalledWith(command);
-    expect(result).toEqual(expectedResult);
+    expect(WSClient.sendToOne).toHaveBeenCalledWith(connectionId, payload);
+    expect(result).toEqual(OK());
   });
 
-  it('should call client.send with PostToConnectionCommand with message Hello World', async () => {
-    const command = new PostToConnectionCommand({
-      ConnectionId: connectionId,
-      Data: Buffer.from(JSON.stringify({ message: `Hello World` })),
-    });
+  it('should call sendToOne with Hello World & return OK', async () => {
+    const connectionId = '654321';
+    const payload = { message: `Hello World` };
 
     event.body = { action: 'sayHello', name: undefined };
+    event.requestContext.connectionId = connectionId;
 
     const result = await handler(event, context);
 
-    expect(command).toEqual(command);
-    expect(client.send).toHaveBeenCalledWith(command);
-    expect(result).toEqual(expectedResult);
+    expect(WSClient.sendToOne).toHaveBeenCalledWith(connectionId, payload);
+    expect(result).toEqual(OK());
   });
 });

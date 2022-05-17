@@ -1,10 +1,12 @@
 import {
   DeleteItemCommand,
   DeleteItemCommandInput,
+  DeleteItemCommandOutput,
   DynamoDBClient,
   DynamoDBClientConfig,
   PutItemCommand,
   PutItemCommandInput,
+  PutItemCommandOutput,
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 
@@ -21,40 +23,41 @@ interface DeleteInput {
   tableName: string;
 }
 
-class DynamoUtils {
-  private client: DynamoDBClient;
+interface DynamoDB {
+  write: (
+    input: WriteInput
+  ) => Promise<Record<string, unknown>> | Promise<PutItemCommandOutput>;
+  remove: (input: DeleteInput) => Promise<DeleteItemCommandOutput>;
+}
 
-  constructor(configuration: DynamoDBClientConfig) {
-    this.client = new DynamoDBClient(configuration);
-  }
+const makeDynamoDB = (configuration: DynamoDBClientConfig): DynamoDB => {
+  const client = new DynamoDBClient(configuration);
 
-  async write({ data, tableName }: WriteInput) {
+  const write = async (writeInput: WriteInput) => {
+    const { data, tableName } = writeInput;
+
     const input: PutItemCommandInput = {
       TableName: tableName,
-      Item: this.marshallObj(data),
+      Item: marshallObj(data),
     };
 
     const command = new PutItemCommand(input);
 
     try {
-      return await this.client.send(command);
+      await client.send(command);
     } catch (error) {
       console.log('DB ERROR - Failed to write to DB', error);
     }
 
     return data;
-  }
+  };
 
-  async delete({
-    hashKey,
-    hashValue,
-    rangeKey,
-    rangeValue,
-    tableName,
-  }: DeleteInput) {
+  const remove = async (deleteInput: DeleteInput) => {
+    const { hashKey, hashValue, rangeKey, rangeValue, tableName } = deleteInput;
+
     const input: DeleteItemCommandInput = {
       TableName: tableName,
-      Key: this.marshallObj({
+      Key: marshallObj({
         [hashKey]: hashValue,
         [rangeKey]: rangeValue,
       }),
@@ -63,21 +66,19 @@ class DynamoUtils {
     const command = new DeleteItemCommand(input);
 
     try {
-      return await this.client.send(command);
+      return await client.send(command);
     } catch (error) {
       console.log('DB ERROR - Failed to delete from DB', error);
     }
-  }
+  };
 
-  private marshallObj(data: Record<string, unknown>) {
+  const marshallObj = (data: Record<string, unknown>) => {
     return marshall(data, { removeUndefinedValues: true });
-  }
+  };
 
-  // private unmarshallValues(data: { [key: string]: AttributeValue }) {
-  //   return unmarshall(data);
-  // }
-}
+  return { write, remove };
+};
 
-const DynamoDB = new DynamoUtils({ region: process.env.REGION });
+const DynamoDB = makeDynamoDB({ region: process.env.REGION });
 
-export { DynamoDB as DynamoUtils };
+export { DynamoDB };

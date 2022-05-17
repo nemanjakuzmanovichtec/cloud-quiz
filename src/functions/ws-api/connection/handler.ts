@@ -1,13 +1,10 @@
 import { withApiHooks } from '@hooks/withApiHooks';
-import { DynamoUtils } from '@libs/dynamoDB-client';
+import { DynamoDB } from '@libs/dynamoDB';
 import { APIGatewayProxyHandler } from '@libs/types';
 import { OK, BAD_REQUEST } from '@libs/response';
+import { addHoursToDate, getSecondsSinceEpoch } from '@utils/dateUtils';
 
 import { connectionSchema as schema } from './schema';
-
-const addHoursToDate = (date: Date, hours: number): Date => {
-  return new Date(new Date(date).setUTCHours(date.getUTCHours() + hours));
-};
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   const { routeKey, connectionId } = event.requestContext;
@@ -16,14 +13,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     roomId: 'test-room',
     connectionId,
     createdAt: Date.now(),
-    TTL: addHoursToDate(new Date(), 2).getTime(),
+    TTL: getSecondsSinceEpoch(addHoursToDate(new Date(), 2)),
   };
 
   switch (routeKey) {
     case '$connect':
       // add conn to DB
       // TODO - hide implementation
-      await DynamoUtils.write({
+      await DynamoDB.write({
         data: connectionData,
         tableName: process.env.ConnectionsTable,
       });
@@ -34,7 +31,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
     case '$disconnect':
       // remove conn from DB
       // TODO - hide implementation
-      await DynamoUtils.delete({
+      await DynamoDB.remove({
         hashKey: 'connectionId',
         hashValue: connectionId,
         rangeKey: 'roomId',
