@@ -1,5 +1,5 @@
 import { WSClient } from '@infrastructure/websocket/types';
-import { connectionDb } from '@domain/data-access';
+import { connectionDb } from 'src/data-access';
 import { AnyObj } from '@utils/types';
 
 interface Dependencies {

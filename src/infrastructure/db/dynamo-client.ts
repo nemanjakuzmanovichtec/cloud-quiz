@@ -30,6 +30,8 @@ const makeDynamoClient = (configuration: DynamoDBClientConfig) => {
   const client = new DynamoDBClient(configuration);
 
   const get = async (input: GetInput) => {
+    console.log('makeDynamoClient.get', { input });
+
     const { hashKey, hashValue, rangeKey, rangeValue, tableName } = input;
 
     const commandInput: GetItemCommandInput = {
@@ -53,6 +55,8 @@ const makeDynamoClient = (configuration: DynamoDBClientConfig) => {
   };
 
   const write = async <T>(input: WriteInput<T>) => {
+    console.log('makeDynamoClient.write', { input });
+
     const { data, tableName } = input;
 
     const commandInput: PutItemCommandInput = {
@@ -73,6 +77,8 @@ const makeDynamoClient = (configuration: DynamoDBClientConfig) => {
   };
 
   const remove = async (input: RemoveInput) => {
+    console.log('makeDynamoClient.remove', { input });
+
     const { hashKey, hashValue, rangeKey, rangeValue, tableName } = input;
 
     const commandInput: DeleteItemCommandInput = {
@@ -94,10 +100,14 @@ const makeDynamoClient = (configuration: DynamoDBClientConfig) => {
   };
 
   const marshallObj = <T>(data: T) => {
+    console.log('makeDynamoClient.marshallObj', { data });
+
     return marshall(data, { removeUndefinedValues: true });
   };
 
   const unmarshallObj = (data: { [key: string]: AttributeValue }) => {
+    console.log('makeDynamoClient.unmarshallObj', { data });
+
     return unmarshall(data);
   };
 

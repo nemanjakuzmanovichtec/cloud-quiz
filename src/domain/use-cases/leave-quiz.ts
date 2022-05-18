@@ -1,5 +1,5 @@
 import { notifyPlayers } from '@domain/use-cases';
-import { connectionDb } from '@domain/data-access';
+import { connectionDb } from 'src/data-access';
 
 interface Dependencies {
   connectionDb: typeof connectionDb;
@@ -20,7 +20,7 @@ export const makeLeaveQuiz = ({
 
     const { connectionId, quizId } = input;
 
-    if (!connectionId || quizId) {
+    if (!connectionId || !quizId) {
       throw new Error('You must supply connectionId & quizId.');
     }
 

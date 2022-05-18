@@ -8,11 +8,13 @@ interface Deps {
 
 export const makeWSApiGatewayClientAdapter = ({ client }: Deps): WSClient => {
   const send = async (to: string, payload: AnyObj) => {
-    client.sendToOne(to, payload);
+    console.log('makeWSApiGatewayClientAdapter.send', { to, payload });
+    await client.sendToOne(to, payload);
   };
 
   const broadcast = async (to: string[], payload: AnyObj) => {
-    client.sendToMany(to, payload);
+    console.log('makeWSApiGatewayClientAdapter.broadcast', { to, payload });
+    await client.sendToMany(to, payload);
   };
 
   return { send, broadcast };

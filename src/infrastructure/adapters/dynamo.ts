@@ -7,6 +7,8 @@ interface Deps {
 
 export const makeDynamoDBAdapter = ({ DynamoDB }: Deps): Database => {
   const findOne = async (where: WhereCondition, metadata: Metadata) => {
+    console.log('makeDynamoDBAdapter.findOne', { where, metadata });
+
     const {
       primaryKey: hashKey,
       primaryKeyValue: hashValue,
@@ -25,12 +27,16 @@ export const makeDynamoDBAdapter = ({ DynamoDB }: Deps): Database => {
   };
 
   const save = async <T>(data: T, metadata: Metadata) => {
+    console.log('makeDynamoDBAdapter.save', { data, metadata });
+
     const { tableName } = metadata;
 
     return DynamoDB.write<T>({ data, tableName });
   };
 
   const remove = async (where: WhereCondition, metadata: Metadata) => {
+    console.log('makeDynamoDBAdapter.remove', { where, metadata });
+
     const {
       primaryKey: hashKey,
       primaryKeyValue: hashValue,

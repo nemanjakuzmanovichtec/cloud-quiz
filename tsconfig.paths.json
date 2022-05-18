@@ -6,6 +6,8 @@
       "@application/*": ["src/application/*"],
       "@domain": ["src/domain"],
       "@domain/*": ["src/domain/*"],
+      "@data-access": ["src/data-access"],
+      "@data-access/*": ["src/data-access/*"],
       "@infrastructure": ["src/infrastructure"],
       "@infrastructure/*": ["src/infrastructure/*"],
       "@utils": ["src/utils"],

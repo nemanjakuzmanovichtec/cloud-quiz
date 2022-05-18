@@ -1,5 +1,5 @@
 import { notifyPlayers } from '@domain/use-cases';
-import { connectionDb } from '@domain/data-access';
+import { connectionDb } from 'src/data-access';
 import { makeConnection } from '@domain/entities/connection';
 
 interface Dependencies {

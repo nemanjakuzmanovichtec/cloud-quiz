@@ -13,6 +13,8 @@ export const makeWSClient = (
     connectionId: string | undefined,
     payload: Record<string, unknown>
   ) => {
+    console.log('makeWSClient.sendToOne', { connectionId, payload });
+
     if (!connectionId) {
       throw new Error('connectionId is required to send a message');
     }
@@ -35,6 +37,11 @@ export const makeWSClient = (
     connectionIds: string[],
     payload: Record<string, unknown>
   ) => {
+    console.log('makeWSClient.sendToMany', {
+      connectionIds,
+      payload,
+    });
+
     const all = connectionIds.map((connectionId) =>
       sendToOne(connectionId, payload)
     );
