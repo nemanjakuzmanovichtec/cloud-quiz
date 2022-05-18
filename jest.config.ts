@@ -8,9 +8,8 @@ const config: Config.InitialOptions = {
   clearMocks: true,
   testEnvironment: 'node',
   collectCoverageFrom: [
-    '<rootDir>/src/functions/**/handler.ts',
-    '<rootDir>/src/hooks/**/*',
-    '<rootDir>/src/libs/**/*',
+    '<rootDir>/src/**/*',
+    '!<rootDir>/src/application/functions/**/index.ts',
   ],
   coveragePathIgnorePatterns: ['<rootDir>/.*[./]test([.].*)*[.](js|ts)x?$'],
   roots: ['<rootDir>'],

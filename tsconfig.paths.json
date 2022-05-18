@@ -2,20 +2,16 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@mocks": ["__mocks__"],
-      "@mocks/*": ["__mocks__/*"],
-      "@functions": ["src/functions"],
-      "@functions/*": ["src/functions/*"],
-      "@libs": ["src/libs"],
-      "@libs/*": ["src/libs/*"],
-      "@hooks": ["src/hooks"],
-      "@hooks/*": ["src/hooks/*"],
+      "@application": ["src/application"],
+      "@application/*": ["src/application/*"],
+      "@domain": ["src/domain"],
+      "@domain/*": ["src/domain/*"],
+      "@infrastructure": ["src/infrastructure"],
+      "@infrastructure/*": ["src/infrastructure/*"],
       "@utils": ["src/utils"],
       "@utils/*": ["src/utils/*"],
-      "@services": ["src/services"],
-      "@services/*": ["src/services/*"],
-      "@persistence": ["src/persistence"],
-      "@persistence/*": ["src/persistence/*"]
+      "@mocks": ["__mocks__"],
+      "@mocks/*": ["__mocks__/*"]
     }
   }
 }

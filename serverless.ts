@@ -1,5 +1,5 @@
 import type { AWS } from '@serverless/typescript';
-import * as functions from '@functions';
+import * as functions from '@application/functions';
 import CognitoResources from 'resources/Cognito';
 import DynamoDBResources from 'resources/DynamoDB';
 
