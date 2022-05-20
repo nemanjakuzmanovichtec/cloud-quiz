@@ -1,15 +1,15 @@
-import { WSClient } from '@infrastructure/websocket/types';
+import { IWSClient } from '@infrastructure/websocket/types';
 import { AnyObj } from '@utils/types';
 
 interface Dependencies {
-  WSClient: WSClient;
+  WSClient: IWSClient;
 }
 
 export const makeNotifyPlayer = ({ WSClient }: Dependencies) => {
-  const notifyPlayer = async (playerId: string, payload: AnyObj) => {
+  const notifyPlayer = async (connectionId: string, payload: AnyObj) => {
     console.log('makeNotifyPlayer.notifyPlayer', payload);
 
-    await WSClient.send(playerId, payload);
+    await WSClient.send(connectionId, payload);
   };
 
   return notifyPlayer;

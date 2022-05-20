@@ -36,6 +36,7 @@ const serverlessConfiguration: AWS = {
     name: PROVIDER_NAME,
     runtime: RUNTIME,
     region: REGION,
+    stage: '${opt:stage, "development"}',
     tags: { Project: '${self:service}', Environment: '${sls:stage}' },
     apiGateway: {
       minimumCompressionSize: 1024,
@@ -68,7 +69,9 @@ const serverlessConfiguration: AWS = {
   plugins: [
     'serverless-esbuild',
     'serverless-iam-roles-per-function',
+    'serverless-dynamodb-local',
     'serverless-offline',
+    'serverless-export-env',
   ],
   custom: {
     esbuild: {
@@ -80,6 +83,12 @@ const serverlessConfiguration: AWS = {
       define: { 'require.resolve': undefined },
       platform: 'node',
       concurrency: 10,
+    },
+    dynamodb: {
+      stages: ['development'],
+      start: {
+        migrate: true,
+      },
     },
   },
   functions: { ...functions },

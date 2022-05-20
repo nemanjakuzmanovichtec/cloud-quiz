@@ -1,5 +1,5 @@
-import { WSApiGatewayClientAdapter as WSClient } from '@infrastructure/adapters';
 import { connectionDb } from '@data-access';
+import { WSClient } from '@infrastructure/websocket';
 
 import { makeJoinQuiz } from './join-quiz';
 import { makeLeaveQuiz } from './leave-quiz';

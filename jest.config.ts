@@ -15,6 +15,7 @@ const config: Config.InitialOptions = {
   roots: ['<rootDir>'],
   modulePaths: [compilerOptions.baseUrl],
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths),
+  setupFiles: ['<rootDir>/tests/config/test-env.ts'],
 };
 
 export default config;

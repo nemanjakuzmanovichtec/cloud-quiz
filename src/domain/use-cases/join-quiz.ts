@@ -1,9 +1,9 @@
 import { notifyPlayers } from '@domain/use-cases';
-import { connectionDb } from 'src/data-access';
 import { makeConnection } from '@domain/entities/connection';
+import { ConnectionDb } from '@data-access/connection-db';
 
 interface Dependencies {
-  connectionDb: typeof connectionDb;
+  connectionDb: ConnectionDb;
   notifyPlayers: typeof notifyPlayers;
 }
 
@@ -19,10 +19,12 @@ export const makeJoinQuiz = ({ connectionDb, notifyPlayers }: Dependencies) => {
     const { connectionId, quizId } = input;
     const entity = makeConnection({ connectionId, roomId: quizId });
 
-    await connectionDb.save(entity);
+    const connection = await connectionDb.save(entity);
     await notifyPlayers(quizId, {
       message: `Player ${connectionId} has joined`,
     });
+
+    return connection;
   };
 
   return joinQuiz;

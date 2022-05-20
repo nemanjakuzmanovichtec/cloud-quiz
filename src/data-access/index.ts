@@ -1,9 +1,7 @@
-import { DynamoDBAdapter } from '@infrastructure/adapters';
+import { DB } from '@infrastructure/db';
 
 import { makeConnectionDb } from './connection-db';
 
-const connectionDb = makeConnectionDb({
-  db: DynamoDBAdapter,
-});
+const connectionDb = makeConnectionDb({ DB });
 
 export { connectionDb };

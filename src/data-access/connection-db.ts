@@ -1,9 +1,15 @@
 import { DateUtils } from '@utils/date-utils';
 import { ConnectionEntity } from '@domain/entities/connection';
-import { Database } from '@infrastructure/db/types';
+import { IDatabase, RemoveOutput } from '@infrastructure/db/types';
 
 interface Dependencies {
-  db: Database;
+  DB: IDatabase;
+}
+
+export interface ConnectionDb {
+  findByRoomId: (roomId: string) => Promise<ConnectionDataModel[]>;
+  save: (entity: ConnectionEntity) => Promise<ConnectionDataModel>;
+  remove: (entity: ConnectionEntity) => Promise<RemoveOutput>;
 }
 
 export interface ConnectionDataModel {
@@ -13,28 +19,40 @@ export interface ConnectionDataModel {
   TTL: number;
 }
 
-export const makeConnectionDb = ({ db }: Dependencies) => {
+export const makeConnectionDb = ({ DB }: Dependencies): ConnectionDb => {
   const tableName = process.env.ConnectionsTable;
 
-  const save = async (entity: ConnectionEntity) => {
+  const findByRoomId = async (
+    roomId: string
+  ): Promise<ConnectionDataModel[]> => {
+    console.log('makeConnectionDb.findByRoomId', { roomId });
+
+    // TO BE IMPLEMENTED
+    return [];
+  };
+
+  const save = async (
+    entity: ConnectionEntity
+  ): Promise<ConnectionDataModel> => {
     console.log('makeConnectionDb.save', entity);
 
     const { connectionId, roomId } = entity;
 
-    const twoHoursFromToday = DateUtils.addHoursToDate(new Date(), 2);
+    const now = Date.now();
+    const twoHoursFromToday = DateUtils.addHoursToDate(new Date(now), 2);
     const TTL = DateUtils.getSecondsSinceEpoch(twoHoursFromToday);
 
     const data: ConnectionDataModel = {
       connectionId,
       roomId,
-      createdAt: Date.now(),
+      createdAt: now,
       TTL,
     };
 
-    await db.save(data, { tableName });
+    return DB.save(data, { tableName });
   };
 
-  const remove = async (entity: ConnectionEntity) => {
+  const remove = async (entity: ConnectionEntity): Promise<RemoveOutput> => {
     console.log('makeConnectionDb.remove', entity);
 
     const { connectionId, roomId } = entity;
@@ -46,8 +64,8 @@ export const makeConnectionDb = ({ db }: Dependencies) => {
       secondaryKeyValue: roomId,
     };
 
-    await db.remove(data, { tableName });
+    return DB.remove(data, { tableName });
   };
 
-  return { save, remove };
+  return { findByRoomId, save, remove };
 };

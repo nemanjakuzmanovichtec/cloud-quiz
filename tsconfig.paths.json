@@ -12,8 +12,8 @@
       "@infrastructure/*": ["src/infrastructure/*"],
       "@utils": ["src/utils"],
       "@utils/*": ["src/utils/*"],
-      "@mocks": ["__mocks__"],
-      "@mocks/*": ["__mocks__/*"]
+      "@tests": ["tests"],
+      "@tests/*": ["tests/*"]
     }
   }
 }

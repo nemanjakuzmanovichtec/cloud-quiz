@@ -1,6 +1,13 @@
 import { AnyObj } from '@utils/types';
 
-export interface WSClient {
-  send: (to: string, payload: AnyObj) => Promise<AnyObj | void>;
-  broadcast: (to: string[], payload: AnyObj) => Promise<AnyObj | void>;
+export interface WSClientResponse {
+  statusCode: number;
+}
+
+export interface IWSClient {
+  send: (recipient: string, payload: AnyObj) => Promise<WSClientResponse>;
+  broadcast: (
+    recipients: string[],
+    payload: AnyObj
+  ) => Promise<WSClientResponse[]>;
 }

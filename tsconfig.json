@@ -13,12 +13,7 @@
     "esModuleInterop": true,
     "outDir": "lib"
   },
-  "include": [
-    "src/**/*.ts",
-    "serverless.ts",
-    "tests/**/*.ts",
-    "__mocks__/**/*.ts"
-  ],
+  "include": ["src/**/*.ts", "serverless.ts", "tests/**/*.ts"],
   "exclude": [
     "node_modules/**/*",
     ".serverless/**/*",

@@ -3,7 +3,12 @@ export interface ConnectionEntity {
   connectionId: string;
 }
 
-export const makeConnection = ({ connectionId, roomId }): ConnectionEntity => {
+type Dependencies = ConnectionEntity;
+
+export const makeConnection = ({
+  connectionId,
+  roomId,
+}: Dependencies): ConnectionEntity => {
   console.log('makeConnection', { connectionId, roomId });
 
   if (!connectionId) {

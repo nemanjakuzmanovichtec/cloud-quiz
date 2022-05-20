@@ -5,6 +5,7 @@ const DynamoResources: AWS['resources']['Resources'] = {
     Type: 'AWS::DynamoDB::Table',
     DeletionPolicy: 'Retain',
     Properties: {
+      TableName: 'ConnectionsTable',
       AttributeDefinitions: [
         {
           AttributeName: 'connectionId',

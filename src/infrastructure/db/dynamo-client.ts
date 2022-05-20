@@ -1,119 +1,120 @@
 import {
-  DeleteItemCommand,
-  DeleteItemCommandInput,
-  DynamoDBClient,
-  DynamoDBClientConfig,
-  PutItemCommand,
-  PutItemCommandInput,
-  GetItemCommandInput,
-  GetItemCommand,
-  AttributeValue,
-} from '@aws-sdk/client-dynamodb';
-import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+  DeleteCommand,
+  DeleteCommandInput,
+  DeleteCommandOutput,
+  DynamoDBDocumentClient,
+  GetCommand,
+  GetCommandInput,
+  GetCommandOutput,
+  PutCommand,
+  PutCommandInput,
+  PutCommandOutput,
+} from '@aws-sdk/lib-dynamodb';
+import { IDatabase, Metadata, RemoveOutput, WhereCondition } from './types';
 
-interface WriteInput<T> {
-  data: T;
-  tableName: string;
+interface Dependencies {
+  client: DynamoDBDocumentClient;
 }
 
-interface GetInput {
-  hashKey: string;
-  hashValue: string;
-  rangeKey: string;
-  rangeValue: string;
-  tableName: string;
-}
-
-type RemoveInput = GetInput;
-
-const makeDynamoClient = (configuration: DynamoDBClientConfig) => {
-  const client = new DynamoDBClient(configuration);
-
-  const get = async (input: GetInput) => {
-    console.log('makeDynamoClient.get', { input });
-
-    const { hashKey, hashValue, rangeKey, rangeValue, tableName } = input;
-
-    const commandInput: GetItemCommandInput = {
-      TableName: tableName,
-      Key: marshallObj({
-        [hashKey]: hashValue,
-        [rangeKey]: rangeValue,
-      }),
-    };
-
-    const command = new GetItemCommand(commandInput);
+export const makeDynamoDb = ({ client }: Dependencies): IDatabase => {
+  const findOne = async (where: WhereCondition, metadata: Metadata) => {
+    console.log('DynamoDb.findOne', { where, metadata });
 
     try {
-      const output = await client.send(command);
+      const output = await dynamoGet(where, metadata);
 
-      return unmarshallObj(output.Item);
+      return output.Item;
     } catch (error) {
       console.error('DB ERROR - Failed to get item from DB', error);
-      throw new Error('GetItemCommand unsuccessful');
+      throw new Error('DB ERROR - Failed to get item from DB');
     }
   };
 
-  const write = async <T>(input: WriteInput<T>) => {
-    console.log('makeDynamoClient.write', { input });
-
-    const { data, tableName } = input;
-
-    const commandInput: PutItemCommandInput = {
-      TableName: tableName,
-      Item: marshallObj(data),
-    };
-
-    const command = new PutItemCommand(commandInput);
+  const save = async <T>(data: T, metadata: Metadata): Promise<T> => {
+    console.log('DynamoDb.save', { data, metadata });
 
     try {
-      await client.send(command);
+      await dynamoPut<T>(data, metadata);
+
+      return data;
     } catch (error) {
       console.error('DB ERROR - Failed to write to DB', error);
-      throw new Error('PutItemCommand unsuccessful');
+      throw new Error('DB ERROR - Failed to write to DB');
     }
-
-    return data;
   };
 
-  const remove = async (input: RemoveInput) => {
-    console.log('makeDynamoClient.remove', { input });
-
-    const { hashKey, hashValue, rangeKey, rangeValue, tableName } = input;
-
-    const commandInput: DeleteItemCommandInput = {
-      TableName: tableName,
-      Key: marshallObj({
-        [hashKey]: hashValue,
-        [rangeKey]: rangeValue,
-      }),
-    };
-
-    const command = new DeleteItemCommand(commandInput);
+  const remove = async (
+    where: WhereCondition,
+    metadata: Metadata
+  ): Promise<RemoveOutput> => {
+    console.log('DynamoDb.remove', { where, metadata });
 
     try {
-      await client.send(command);
+      const output = await dynamoDelete(where, metadata);
+
+      return { deletedCount: output.Attributes ? 1 : 0 };
     } catch (error) {
       console.error('DB ERROR - Failed to delete from DB', error);
-      throw new Error('DeleteItemCommand unsuccessful');
+      throw new Error('DB ERROR - Failed to delete from DB');
     }
   };
 
-  const marshallObj = <T>(data: T) => {
-    console.log('makeDynamoClient.marshallObj', { data });
+  const dynamoGet = async (
+    where: WhereCondition,
+    metadata: Metadata
+  ): Promise<GetCommandOutput> => {
+    const { primaryKey, primaryKeyValue, secondaryKey, secondaryKeyValue } =
+      where;
+    const { tableName } = metadata;
 
-    return marshall(data, { removeUndefinedValues: true });
+    const commandInput: GetCommandInput = {
+      TableName: tableName,
+      Key: { [primaryKey]: primaryKeyValue, [secondaryKey]: secondaryKeyValue },
+    };
+
+    const command = new GetCommand(commandInput);
+
+    return client.send(command);
   };
 
-  const unmarshallObj = (data: { [key: string]: AttributeValue }) => {
-    console.log('makeDynamoClient.unmarshallObj', { data });
+  const dynamoPut = async <T>(
+    data: T,
+    metadata: Metadata
+  ): Promise<PutCommandOutput> => {
+    const { tableName } = metadata;
 
-    return unmarshall(data);
+    const commandInput: PutCommandInput = {
+      TableName: tableName,
+      Item: data,
+    };
+
+    const command = new PutCommand(commandInput);
+
+    return client.send(command);
   };
 
-  return { get, write, remove };
+  const dynamoDelete = async (
+    where: WhereCondition,
+    metadata: Metadata
+  ): Promise<DeleteCommandOutput> => {
+    const { primaryKey, primaryKeyValue, secondaryKey, secondaryKeyValue } =
+      where;
+    const { tableName } = metadata;
+
+    const commandInput: DeleteCommandInput = {
+      TableName: tableName,
+      Key: {
+        [primaryKey]: primaryKeyValue,
+        [secondaryKey]: secondaryKeyValue,
+      },
+      ConditionExpression: `attribute_exists(${primaryKey})`,
+      ReturnValues: 'ALL_OLD',
+    };
+
+    const command = new DeleteCommand(commandInput);
+
+    return client.send(command);
+  };
+
+  return { findOne, save, remove };
 };
-
-const DynamoClient = makeDynamoClient({ region: process.env.REGION });
-
-export { DynamoClient };
