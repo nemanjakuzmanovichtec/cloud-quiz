@@ -1,13 +1,16 @@
-import { DB } from '@infrastructure/db';
+import { mock, MockProxy } from 'jest-mock-extended';
 import { makeFakeConnection } from '@tests/fixtures/connection';
 
-import { ConnectionDb, makeConnectionDb } from './connection-db';
+import { IConnectionRepo, makeConnectionDb } from './connection-db';
+import { IDynamoDBRepo } from './ddb-base-repository';
 
 describe('connection db', () => {
-  let connectionDb: ConnectionDb;
+  let mockRepo: MockProxy<IDynamoDBRepo>;
+  let connectionDb: IConnectionRepo;
 
   beforeEach(() => {
-    connectionDb = makeConnectionDb({ DB });
+    mockRepo = mock<IDynamoDBRepo>();
+    connectionDb = makeConnectionDb({ repository: mockRepo });
   });
 
   it('save a connection', async () => {
@@ -28,9 +31,8 @@ describe('connection db', () => {
   it('remove a connection', async () => {
     const fakeEntity = makeFakeConnection();
 
-    await connectionDb.save(fakeEntity);
-    const result = await connectionDb.remove(fakeEntity);
+    await connectionDb.remove(fakeEntity);
 
-    expect(result).toMatchObject({ deletedCount: 1 });
+    expect(mockRepo.remove).toBeCalled();
   });
 });

@@ -38,12 +38,12 @@ describe('makeWSClient', () => {
       await wsClient.send(connectionId, null);
     } catch (error) {
       expect(error.message).toEqual(
-        'Websocket ERROR: Sending a message failed'
+        `Websocket ERROR: Sending a message to recipient ${connectionId} failed`
       );
     }
   });
 
-  it('send - should send successfully', async () => {
+  it('sends message successfully', async () => {
     clientMock
       .on(PostToConnectionCommand)
       .resolves({ $metadata: { httpStatusCode: 204 } });
@@ -53,10 +53,10 @@ describe('makeWSClient', () => {
 
     const result = await wsClient.send(connectionId, payload);
 
-    expect(result).toMatchObject({ statusCode: 204 });
+    expect(result).toBe(undefined);
   });
 
-  it('broadcast - should return array of same length as input', async () => {
+  it('broadcasts message successfully', async () => {
     clientMock
       .on(PostToConnectionCommand)
       .resolves({ $metadata: { httpStatusCode: 204 } });
@@ -64,8 +64,8 @@ describe('makeWSClient', () => {
     const connectionIds = ['1234', '2345'];
     const payload = { message: `Hello World` };
 
-    const response = await wsClient.broadcast(connectionIds, payload);
+    const result = await wsClient.broadcast(connectionIds, payload);
 
-    expect(response).toHaveLength(connectionIds.length);
+    expect(result).toBe(undefined);
   });
 });

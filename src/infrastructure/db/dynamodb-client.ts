@@ -1,6 +1,5 @@
 import { DynamoDBClient, DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
-import { makeDynamoDb } from './dynamo-client';
 
 export const buildConfig = (): DynamoDBClientConfig => {
   const isServerlessOffline = !!process.env.IS_OFFLINE;
@@ -34,6 +33,5 @@ const makeDocumentClient = (config: DynamoDBClientConfig) => {
 
 const config = buildConfig();
 const client = makeDocumentClient(config);
-const dynamoDb = makeDynamoDb({ client });
 
-export { dynamoDb as DB };
+export { client as ddbClient };

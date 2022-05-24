@@ -1,9 +1,9 @@
 import { notifyPlayers } from '@domain/use-cases';
 import { makeConnection } from '@domain/entities/connection';
-import { ConnectionDb } from '@data-access/connection-db';
+import { IConnectionRepo } from '@infrastructure/repository/connection-db';
 
 interface Dependencies {
-  connectionDb: ConnectionDb;
+  connectionDb: IConnectionRepo;
   notifyPlayers: typeof notifyPlayers;
 }
 
@@ -14,13 +14,13 @@ interface JoinQuizInput {
 
 export const makeJoinQuiz = ({ connectionDb, notifyPlayers }: Dependencies) => {
   const joinQuiz = async (input: JoinQuizInput) => {
-    console.log('makeJoinQuiz.joinQuiz', input);
+    console.log('makeJoinQuiz.joinQuiz', input, notifyPlayers);
 
-    const { connectionId, quizId } = input;
-    const entity = makeConnection({ connectionId, roomId: quizId });
-
+    const entity = makeConnection({ ...input, roomId: input.quizId });
     const connection = await connectionDb.save(entity);
-    await notifyPlayers(quizId, {
+    const { roomId, connectionId } = connection;
+
+    await notifyPlayers(roomId, {
       message: `Player ${connectionId} has joined`,
     });
 

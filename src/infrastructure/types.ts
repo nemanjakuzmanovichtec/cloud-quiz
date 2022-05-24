@@ -16,6 +16,7 @@ export interface RemoveOutput {
 }
 
 export interface IDatabase {
+  find: (where: WhereCondition, metadata: Metadata) => Promise<AnyObj[]>;
   findOne: (where: WhereCondition, metadata: Metadata) => Promise<AnyObj>;
   save: <T>(data: T, metadata: Metadata) => Promise<T>;
   remove: (where: WhereCondition, metadata: Metadata) => Promise<RemoveOutput>;

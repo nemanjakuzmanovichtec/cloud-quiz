@@ -1,26 +1,44 @@
-import { makeConnectionDb } from '@data-access/connection-db';
-import { DB } from '@infrastructure/db';
-import { WSClient } from '@infrastructure/websocket';
+import { mock, MockProxy } from 'jest-mock-extended';
+import { IConnectionRepo } from '@infrastructure/repository/connection-db';
 
 import { makeJoinQuiz } from './join-quiz';
-import { makeNotifyPlayers } from './notify-players';
+import { joinQuiz, notifyPlayers } from '.';
 
 describe('joinQuiz', () => {
-  let connectionDb;
-  let notifyPlayers;
-  let joinQuiz;
+  let connectionDbMock: MockProxy<IConnectionRepo>;
+  let notifyPlayersMock: MockProxy<typeof notifyPlayers>;
 
-  beforeAll(() => {
-    connectionDb = makeConnectionDb({ DB });
-    notifyPlayers = makeNotifyPlayers({ connectionDb, WSClient });
-    joinQuiz = makeJoinQuiz({ connectionDb, notifyPlayers });
+  let sut: typeof joinQuiz;
+
+  beforeEach(() => {
+    connectionDbMock = mock<IConnectionRepo>();
+    notifyPlayersMock = jest.fn();
+
+    sut = makeJoinQuiz({
+      connectionDb: connectionDbMock,
+      notifyPlayers: notifyPlayersMock,
+    });
+  });
+
+  beforeEach(() => {
+    jest.resetAllMocks();
   });
 
   it('saves connection entity to the db', async () => {
+    const resolved = {
+      connectionId: '1234',
+      roomId: 'test-quiz',
+      createdAt: 123456789,
+      TTL: 123456,
+    };
+    connectionDbMock.save.mockResolvedValue(resolved);
     const input = { connectionId: '1234', quizId: 'test-quiz' };
 
-    const result = await joinQuiz(input);
+    const result = await sut(input);
 
+    expect(notifyPlayersMock).toBeCalledWith(resolved.roomId, {
+      message: `Player ${resolved.connectionId} has joined`,
+    });
     expect(result).toMatchObject({
       connectionId: input.connectionId,
       roomId: input.quizId,

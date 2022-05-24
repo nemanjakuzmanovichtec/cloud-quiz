@@ -1,4 +1,4 @@
-import { buildConfig } from '.';
+import { buildConfig } from './dynamodb-client';
 
 describe('buildConfig', () => {
   const OLD_ENV = process.env;

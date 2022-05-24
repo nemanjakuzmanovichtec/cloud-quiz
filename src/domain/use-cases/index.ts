@@ -1,4 +1,4 @@
-import { connectionDb } from '@data-access';
+import { connectionDb } from '@infrastructure/repository';
 import { WSClient } from '@infrastructure/websocket';
 
 import { makeJoinQuiz } from './join-quiz';

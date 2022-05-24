@@ -8,21 +8,21 @@ const DynamoResources: AWS['resources']['Resources'] = {
       TableName: 'ConnectionsTable',
       AttributeDefinitions: [
         {
-          AttributeName: 'connectionId',
+          AttributeName: 'roomId',
           AttributeType: 'S',
         },
         {
-          AttributeName: 'roomId',
+          AttributeName: 'connectionId',
           AttributeType: 'S',
         },
       ],
       KeySchema: [
         {
-          AttributeName: 'connectionId',
+          AttributeName: 'roomId',
           KeyType: 'HASH',
         },
         {
-          AttributeName: 'roomId',
+          AttributeName: 'connectionId',
           KeyType: 'RANGE',
         },
       ],
