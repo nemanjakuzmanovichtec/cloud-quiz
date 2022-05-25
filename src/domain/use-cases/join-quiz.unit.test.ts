@@ -25,7 +25,7 @@ describe('join quiz', () => {
     jest.resetAllMocks();
   });
 
-  it('saves connection entity to the db', async () => {
+  it('A new player joins the quiz', async () => {
     const resolved = {
       connectionId: '1234',
       roomId: 'test-quiz',
@@ -37,9 +37,10 @@ describe('join quiz', () => {
 
     const result = await sut(input);
 
-    expect(notifyPlayersMock).toBeCalledWith(resolved.roomId, {
-      message: `Player ${resolved.connectionId} has joined`,
-    });
+    expect(notifyPlayersMock).toBeCalledWith(
+      { myConnectionId: resolved.connectionId, quizId: resolved.roomId },
+      { message: `Player ${resolved.connectionId} has joined` }
+    );
     expect(result).toMatchObject({
       connectionId: input.connectionId,
       roomId: input.quizId,

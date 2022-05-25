@@ -25,7 +25,10 @@ export const makeLeaveQuiz = ({
     }
 
     await connectionDb.remove({ connectionId, roomId: quizId });
-    await notifyPlayers(quizId, { message: `Player ${connectionId} has left` });
+
+    const connectionData = { myConnectionId: connectionId, quizId };
+    const payload = { message: `Player ${connectionId} has left` };
+    await notifyPlayers(connectionData, payload);
   };
 
   return leaveQuiz;

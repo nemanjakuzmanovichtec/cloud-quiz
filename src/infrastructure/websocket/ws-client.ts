@@ -1,58 +1,44 @@
-import {
-  ApiGatewayManagementApiClient,
-  PostToConnectionCommand,
-  PostToConnectionCommandInput,
-  PostToConnectionCommandOutput,
-} from '@aws-sdk/client-apigatewaymanagementapi';
 import { AnyObj } from '@utils/types';
+import { ApiGatewayWSClient } from './api-gateway-ws-client';
 
 import { IWSClient } from './types';
 
 interface Dependencies {
-  client: ApiGatewayManagementApiClient;
+  client: typeof ApiGatewayWSClient;
 }
 
 export const makeWSClient = ({ client }: Dependencies): IWSClient => {
   const send = async (
     recipient: string,
     payload: AnyObj
-  ): Promise<PostToConnectionCommandOutput> => {
+  ): Promise<{ statusCode: number }> => {
     console.log('WSClient.send', { recipient, payload });
 
     if (!recipient) {
       throw new Error('Recipient is required to send a message');
     }
 
-    const input: PostToConnectionCommandInput = {
-      ConnectionId: recipient,
-      Data: Buffer.from(JSON.stringify(payload)),
-    };
+    const data = client.serializePayload(payload);
+    const result = await client.postToConnection(recipient, data);
 
-    const command = new PostToConnectionCommand(input);
-
-    try {
-      console.log('Executing PostToConnectionCommand with:', input);
-
-      const output = await client.send(command);
-
-      console.log('PostToConnectionCommand executed successfully:', output);
-
-      return output;
-    } catch (error) {
-      console.error('Websocket ERROR:', error);
-      throw new Error(
-        `Websocket ERROR: Sending a message to recipient ${recipient} failed`
-      );
-    }
+    return { statusCode: result.$metadata.httpStatusCode };
   };
 
   const broadcast = async (
     recipients: string[],
     payload: AnyObj
-  ): Promise<void> => {
+  ): Promise<{ statusCode: number }> => {
     console.log('WSClient.broadcast', { recipients, payload });
 
-    recipients.forEach((recipient) => send(recipient, payload));
+    const data = client.serializePayload(payload);
+
+    const promises = recipients.map((recipient) =>
+      client.postToConnection(recipient, data)
+    );
+
+    await Promise.all(promises);
+
+    return { statusCode: 204 };
   };
 
   return { send, broadcast };

@@ -21,9 +21,10 @@ export const makeJoinQuiz = ({ connectionDb, notifyPlayers }: Dependencies) => {
 
     const { roomId, connectionId } = connection;
 
-    await notifyPlayers(roomId, {
-      message: `Player ${connectionId} has joined`,
-    });
+    const connectionData = { myConnectionId: connectionId, quizId: roomId };
+    const payload = { message: `Player ${connectionId} has joined` };
+
+    await notifyPlayers(connectionData, payload);
 
     return connection;
   };

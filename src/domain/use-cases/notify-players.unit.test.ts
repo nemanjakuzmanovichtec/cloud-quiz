@@ -3,14 +3,14 @@ import { IWSClient } from '@infrastructure/websocket/types';
 import { IConnectionRepo } from '@infrastructure/repository/connection-db';
 
 import { makeNotifyPlayers } from './notify-players';
-import { notifyPlayer } from '.';
+import { notifyPlayers } from '.';
 
 describe('notify many players', () => {
   let connectionDbMock: MockProxy<IConnectionRepo>;
   let WSClientMock: MockProxy<IWSClient>;
 
   // System under test
-  let sut: typeof notifyPlayer;
+  let sut: typeof notifyPlayers;
 
   beforeEach(() => {
     connectionDbMock = mock<IConnectionRepo>();
@@ -27,11 +27,11 @@ describe('notify many players', () => {
   });
 
   it('must supply quizId', async () => {
-    const quizId = undefined;
+    const connectionData = { myConnectionId: '1234', quizId: undefined };
     const payload = { message: 'test-message' };
 
     try {
-      await sut(quizId, payload);
+      await sut(connectionData, payload);
     } catch (error) {
       expect(error.message).toEqual('Must supply quizId');
     }
@@ -44,12 +44,12 @@ describe('notify many players', () => {
     ];
     connectionDbMock.findByRoomId.mockResolvedValue(resolved);
 
-    const quizId = 'test-quiz';
+    const connectionData = { myConnectionId: '1234', quizId: 'test-quiz' };
     const payload = { message: 'test-message' };
 
-    await sut(quizId, payload);
+    await sut(connectionData, payload);
 
-    expect(connectionDbMock.findByRoomId).toBeCalledWith(quizId);
-    expect(WSClientMock.broadcast).toBeCalledWith(['1234', '12345'], payload);
+    expect(connectionDbMock.findByRoomId).toBeCalledWith(connectionData.quizId);
+    expect(WSClientMock.broadcast).toBeCalledWith(['12345'], payload);
   });
 });

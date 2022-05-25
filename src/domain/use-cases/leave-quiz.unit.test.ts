@@ -55,7 +55,7 @@ describe('leave quiz', () => {
     }
   });
 
-  it('removes connection from db & sends notification', async () => {
+  it('A player leaves the quiz', async () => {
     const input = { connectionId: '1234', quizId: 'test-quiz' };
 
     await sut(input);
@@ -64,8 +64,9 @@ describe('leave quiz', () => {
       connectionId: input.connectionId,
       roomId: input.quizId,
     });
-    expect(notifyPlayersMock).toBeCalledWith(input.quizId, {
-      message: `Player ${input.connectionId} has left`,
-    });
+    expect(notifyPlayersMock).toBeCalledWith(
+      { myConnectionId: input.connectionId, quizId: input.quizId },
+      { message: `Player ${input.connectionId} has left` }
+    );
   });
 });

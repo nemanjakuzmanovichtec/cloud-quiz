@@ -1,71 +1,54 @@
-import { mockClient } from 'aws-sdk-client-mock';
-import {
-  ApiGatewayManagementApiClient,
-  PostToConnectionCommand,
-} from '@aws-sdk/client-apigatewaymanagementapi';
+import { mock, MockProxy } from 'jest-mock-extended';
 
 import { makeWSClient } from './ws-client';
+import { ApiGatewayWSClient } from './api-gateway-ws-client';
 import { IWSClient } from './types';
 
 describe('makeWSClient', () => {
-  const clientMock = mockClient(new ApiGatewayManagementApiClient({}));
-  let wsClient: IWSClient;
+  let clientMock: MockProxy<typeof ApiGatewayWSClient>;
+  let sut: IWSClient;
 
   beforeEach(() => {
-    // @ts-ignore
-    wsClient = makeWSClient({ client: clientMock });
+    clientMock = mock<typeof ApiGatewayWSClient>();
 
-    clientMock.reset();
+    // System under test
+    sut = makeWSClient({ client: clientMock });
+
+    jest.resetAllMocks();
   });
 
-  it('send - should throw connection required error', async () => {
+  it('throws recipient required error', async () => {
     try {
-      await wsClient.send(null, {});
+      await sut.send(null, {});
     } catch (error) {
       expect(error.message).toEqual('Recipient is required to send a message');
     }
   });
 
-  it('send - should throw Websocket ERROR: Sending a message failed', async () => {
-    const connectionId = '1234';
-    const input = { ConnectionId: connectionId, Data: null };
-
-    clientMock
-      .on(PostToConnectionCommand, input)
-      .rejects(new Error('mocked rejection'));
-
-    try {
-      await wsClient.send(connectionId, null);
-    } catch (error) {
-      expect(error.message).toEqual(
-        `Websocket ERROR: Sending a message to recipient ${connectionId} failed`
-      );
-    }
-  });
-
   it('sends message successfully', async () => {
-    clientMock
-      .on(PostToConnectionCommand)
-      .resolves({ $metadata: { httpStatusCode: 204 } });
+    clientMock.postToConnection.mockResolvedValue({
+      $metadata: { httpStatusCode: 204 },
+    });
 
-    const connectionId = '1234';
+    const recipient = '1234';
     const payload = { message: `Hello World` };
 
-    const result = await wsClient.send(connectionId, payload);
+    const result = await sut.send(recipient, payload);
 
-    expect(result).toBe(undefined);
+    expect(result).toMatchObject({ statusCode: 204 });
   });
 
   it('broadcasts message successfully', async () => {
-    clientMock
-      .on(PostToConnectionCommand)
-      .resolves({ $metadata: { httpStatusCode: 204 } });
+    clientMock.postToConnection.mockResolvedValue({
+      $metadata: { httpStatusCode: 204 },
+    });
 
-    const connectionIds = ['1234', '2345'];
+    const recipients = ['1234', '2345'];
     const payload = { message: `Hello World` };
 
-    const result = await wsClient.broadcast(connectionIds, payload);
+    const result = await sut.broadcast(recipients, payload);
 
-    expect(result).toBe(undefined);
+    expect(clientMock.postToConnection).toBeCalledTimes(recipients.length);
+    expect(result).toMatchObject({ statusCode: 204 });
   });
 });

@@ -7,16 +7,28 @@ interface Dependencies {
   WSClient: IWSClient;
 }
 
+interface ConnectionData {
+  myConnectionId: string;
+  quizId: string;
+}
+
 export const makeNotifyPlayers = ({ connectionDb, WSClient }: Dependencies) => {
-  const notifyPlayers = async (quizId: string, payload: AnyObj) => {
-    console.log('makeNotifyPlayers.notifyPlayers', { quizId, payload });
+  const notifyPlayers = async (
+    connectionData: ConnectionData,
+    payload: AnyObj
+  ) => {
+    console.log('makeNotifyPlayers.notifyPlayers', connectionData);
+
+    const { quizId, myConnectionId } = connectionData;
 
     if (!quizId) {
       throw new Error('Must supply quizId');
     }
 
     const connections = await connectionDb.findByRoomId(quizId);
-    const connectionIds = connections.map((conn) => conn.connectionId);
+    const connectionIds = connections
+      .map((conn) => conn.connectionId)
+      .filter((connectionId) => connectionId != myConnectionId);
 
     return WSClient.broadcast(connectionIds, payload);
   };

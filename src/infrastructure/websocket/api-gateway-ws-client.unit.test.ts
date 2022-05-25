@@ -1,4 +1,4 @@
-import { buildConfig } from '.';
+import { buildConfig } from './api-gateway-ws-client';
 
 describe('buildConfig', () => {
   const OLD_ENV = process.env;
