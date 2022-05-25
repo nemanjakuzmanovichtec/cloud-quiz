@@ -4,10 +4,11 @@ import { IConnectionRepo } from '@infrastructure/repository/connection-db';
 import { makeJoinQuiz } from './join-quiz';
 import { joinQuiz, notifyPlayers } from '.';
 
-describe('joinQuiz', () => {
+describe('join quiz', () => {
   let connectionDbMock: MockProxy<IConnectionRepo>;
   let notifyPlayersMock: MockProxy<typeof notifyPlayers>;
 
+  // System under test
   let sut: typeof joinQuiz;
 
   beforeEach(() => {

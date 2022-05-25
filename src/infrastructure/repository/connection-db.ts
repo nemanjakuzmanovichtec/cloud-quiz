@@ -20,8 +20,8 @@ interface Dependencies {
 interface ConnectionDataModel {
   roomId: string;
   connectionId: string;
-  createdAt: number;
-  TTL: number;
+  createdAt?: number;
+  TTL?: number;
 }
 
 export const makeConnectionDb = ({
@@ -36,7 +36,7 @@ export const makeConnectionDb = ({
 
     const commandInput: QueryCommandInput = {
       TableName,
-      KeyConditionExpression: `#roomId = :roomId`,
+      KeyConditionExpression: `roomId = :roomId`,
       ExpressionAttributeValues: {
         ':roomId': roomId,
       },
@@ -79,8 +79,7 @@ export const makeConnectionDb = ({
     const commandInput: DeleteCommandInput = {
       TableName,
       Key: { roomId, connectionId },
-      ExpressionAttributeNames: { '#roomId': roomId },
-      ConditionExpression: `attribute_exists(#primaryKey)`,
+      ConditionExpression: 'attribute_exists(roomId)',
       ReturnValues: 'ALL_OLD',
     };
 

@@ -14,10 +14,11 @@ interface JoinQuizInput {
 
 export const makeJoinQuiz = ({ connectionDb, notifyPlayers }: Dependencies) => {
   const joinQuiz = async (input: JoinQuizInput) => {
-    console.log('makeJoinQuiz.joinQuiz', input, notifyPlayers);
+    console.log('makeJoinQuiz.joinQuiz', input);
 
     const entity = makeConnection({ ...input, roomId: input.quizId });
     const connection = await connectionDb.save(entity);
+
     const { roomId, connectionId } = connection;
 
     await notifyPlayers(roomId, {

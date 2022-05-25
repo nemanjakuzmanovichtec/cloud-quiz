@@ -2,6 +2,7 @@ import {
   ApiGatewayManagementApiClient,
   PostToConnectionCommand,
   PostToConnectionCommandInput,
+  PostToConnectionCommandOutput,
 } from '@aws-sdk/client-apigatewaymanagementapi';
 import { AnyObj } from '@utils/types';
 
@@ -12,7 +13,10 @@ interface Dependencies {
 }
 
 export const makeWSClient = ({ client }: Dependencies): IWSClient => {
-  const send = async (recipient: string, payload: AnyObj) => {
+  const send = async (
+    recipient: string,
+    payload: AnyObj
+  ): Promise<PostToConnectionCommandOutput> => {
     console.log('WSClient.send', { recipient, payload });
 
     if (!recipient) {
@@ -24,14 +28,16 @@ export const makeWSClient = ({ client }: Dependencies): IWSClient => {
       Data: Buffer.from(JSON.stringify(payload)),
     };
 
+    const command = new PostToConnectionCommand(input);
+
     try {
       console.log('Executing PostToConnectionCommand with:', input);
-
-      const command = new PostToConnectionCommand(input);
 
       const output = await client.send(command);
 
       console.log('PostToConnectionCommand executed successfully:', output);
+
+      return output;
     } catch (error) {
       console.error('Websocket ERROR:', error);
       throw new Error(
@@ -40,7 +46,10 @@ export const makeWSClient = ({ client }: Dependencies): IWSClient => {
     }
   };
 
-  const broadcast = async (recipients: string[], payload: AnyObj) => {
+  const broadcast = async (
+    recipients: string[],
+    payload: AnyObj
+  ): Promise<void> => {
     console.log('WSClient.broadcast', { recipients, payload });
 
     recipients.forEach((recipient) => send(recipient, payload));

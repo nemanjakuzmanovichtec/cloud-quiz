@@ -9,7 +9,7 @@ export const makeNotifyPlayer = ({ WSClient }: Dependencies) => {
   const notifyPlayer = async (connectionId: string, payload: AnyObj) => {
     console.log('makeNotifyPlayer.notifyPlayer', payload);
 
-    await WSClient.send(connectionId, payload);
+    return WSClient.send(connectionId, payload);
   };
 
   return notifyPlayer;
