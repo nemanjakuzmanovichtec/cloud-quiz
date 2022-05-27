@@ -11,11 +11,11 @@ interface LeaveQuizInput {
   quizId: string;
 }
 
-export const makeLeaveQuiz = ({
+export const makeLeaveQuizCommand = ({
   connectionDb,
   notifyPlayers,
 }: Dependencies) => {
-  const leaveQuiz = async (input: LeaveQuizInput) => {
+  const execute = async (input: LeaveQuizInput) => {
     console.log('QuizService.leaveQuiz', input);
 
     const { connectionId, quizId } = input;
@@ -31,5 +31,5 @@ export const makeLeaveQuiz = ({
     await notifyPlayers(connectionData, payload);
   };
 
-  return leaveQuiz;
+  return { execute };
 };

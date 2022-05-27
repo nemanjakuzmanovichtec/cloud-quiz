@@ -1,21 +1,21 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import { IConnectionRepo } from '@infrastructure/repository/connection-db';
 
-import { makeJoinQuiz } from './join-quiz';
-import { joinQuiz, notifyPlayers } from '.';
+import { makeJoinQuizCommand } from './join-quiz';
+import { JoinQuizCommand, notifyPlayers } from '.';
 
 describe('join quiz', () => {
   let connectionDbMock: MockProxy<IConnectionRepo>;
   let notifyPlayersMock: MockProxy<typeof notifyPlayers>;
 
   // System under test
-  let sut: typeof joinQuiz;
+  let sut: typeof JoinQuizCommand;
 
   beforeEach(() => {
     connectionDbMock = mock<IConnectionRepo>();
     notifyPlayersMock = jest.fn();
 
-    sut = makeJoinQuiz({
+    sut = makeJoinQuizCommand({
       connectionDb: connectionDbMock,
       notifyPlayers: notifyPlayersMock,
     });
@@ -35,7 +35,7 @@ describe('join quiz', () => {
     connectionDbMock.save.mockResolvedValue(resolved);
     const input = { connectionId: '1234', quizId: 'test-quiz' };
 
-    const result = await sut(input);
+    const result = await sut.execute(input);
 
     expect(notifyPlayersMock).toBeCalledWith(
       { myConnectionId: resolved.connectionId, quizId: resolved.roomId },

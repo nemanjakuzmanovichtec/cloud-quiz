@@ -1,9 +1,8 @@
 import { MockProxy, mock } from 'jest-mock-extended';
-import { handler } from '@application/functions/ws-api/sayHello/handler';
-import { HelloBody } from '@application/functions/ws-api/sayHello/schema';
+import { handler } from '@application/functions/ws-api/say-hello/handler';
+import { HelloBody } from '@application/functions/ws-api/say-hello/schema';
 import { APIGatewayProxyEvent, AWSContext } from '@application/types';
 import { OK } from '@application/helpers/response';
-import { notifyPlayer } from '@domain/use-cases';
 
 jest.mock('@domain/use-cases');
 
@@ -28,8 +27,7 @@ describe('sayHello', () => {
 
     const result = await handler(event, context);
 
-    expect(notifyPlayer).toHaveBeenCalledWith(connectionId, payload);
-    expect(result).toEqual(OK());
+    expect(result).toEqual(OK(payload));
   });
 
   it('should call send with Hello World & return OK', async () => {
@@ -41,7 +39,6 @@ describe('sayHello', () => {
 
     const result = await handler(event, context);
 
-    expect(notifyPlayer).toHaveBeenCalledWith(connectionId, payload);
-    expect(result).toEqual(OK());
+    expect(result).toEqual(OK(payload));
   });
 });

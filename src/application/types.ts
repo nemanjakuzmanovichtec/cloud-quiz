@@ -9,7 +9,7 @@ import { AnyObj } from '@utils/types';
 
 export type LambdaFunction = AWS['functions'][''];
 export type LambdaFunctionWithIam = LambdaFunction & {
-  iamRoleStatements: AwsIamPolicyStatements;
+  iamRoleStatements?: AwsIamPolicyStatements;
 };
 export type AWSContext = Context;
 

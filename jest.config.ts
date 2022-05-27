@@ -7,10 +7,7 @@ const config: Config.InitialOptions = {
   preset: 'ts-jest',
   clearMocks: true,
   testEnvironment: 'node',
-  collectCoverageFrom: [
-    '<rootDir>/src/**/*',
-    '!<rootDir>/src/application/functions/**/index.ts',
-  ],
+  collectCoverageFrom: ['<rootDir>/src/**/*', '!<rootDir>/src/**/index.ts'],
   coveragePathIgnorePatterns: ['<rootDir>/.*[./]test([.].*)*[.](js|ts)x?$'],
   roots: ['<rootDir>'],
   modulePaths: [compilerOptions.baseUrl],

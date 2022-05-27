@@ -79,7 +79,8 @@ export const makeConnectionDb = ({
     const commandInput: DeleteCommandInput = {
       TableName,
       Key: { roomId, connectionId },
-      ConditionExpression: 'attribute_exists(roomId)',
+      ConditionExpression:
+        'attribute_exists(roomId) AND attribute_exists(connectionId)',
       ReturnValues: 'ALL_OLD',
     };
 

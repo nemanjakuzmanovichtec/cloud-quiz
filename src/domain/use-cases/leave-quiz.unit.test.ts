@@ -1,21 +1,21 @@
 import { mock, MockProxy } from 'jest-mock-extended';
 import { IConnectionRepo } from '@infrastructure/repository/connection-db';
 
-import { makeLeaveQuiz } from './leave-quiz';
-import { leaveQuiz, notifyPlayers } from '.';
+import { makeLeaveQuizCommand } from './leave-quiz';
+import { LeaveQuizCommand, notifyPlayers } from '.';
 
 describe('leave quiz', () => {
   let connectionDbMock: MockProxy<IConnectionRepo>;
   let notifyPlayersMock: MockProxy<typeof notifyPlayers>;
 
   // System under test
-  let sut: typeof leaveQuiz;
+  let sut: typeof LeaveQuizCommand;
 
   beforeEach(() => {
     connectionDbMock = mock<IConnectionRepo>();
     notifyPlayersMock = jest.fn();
 
-    sut = makeLeaveQuiz({
+    sut = makeLeaveQuizCommand({
       connectionDb: connectionDbMock,
       notifyPlayers: notifyPlayersMock,
     });
@@ -29,7 +29,7 @@ describe('leave quiz', () => {
     const input = { connectionId: undefined, quizId: 'test-quiz' };
 
     try {
-      await sut(input);
+      await sut.execute(input);
     } catch (error) {
       expect(error.message).toEqual('You must supply connectionId & quizId.');
     }
@@ -39,7 +39,7 @@ describe('leave quiz', () => {
     const input = { connectionId: '1234', quizId: undefined };
 
     try {
-      await sut(input);
+      await sut.execute(input);
     } catch (error) {
       expect(error.message).toEqual('You must supply connectionId & quizId.');
     }
@@ -49,7 +49,7 @@ describe('leave quiz', () => {
     const input = { connectionId: undefined, quizId: undefined };
 
     try {
-      await sut(input);
+      await sut.execute(input);
     } catch (error) {
       expect(error.message).toEqual('You must supply connectionId & quizId.');
     }
@@ -58,7 +58,7 @@ describe('leave quiz', () => {
   it('A player leaves the quiz', async () => {
     const input = { connectionId: '1234', quizId: 'test-quiz' };
 
-    await sut(input);
+    await sut.execute(input);
 
     expect(connectionDbMock.remove).toBeCalledWith({
       connectionId: input.connectionId,

@@ -1,14 +1,12 @@
 import { connectionDb } from '@infrastructure/repository';
 import { WSClient } from '@infrastructure/websocket';
 
-import { makeJoinQuiz } from './join-quiz';
-import { makeLeaveQuiz } from './leave-quiz';
-import { makeNotifyPlayer } from './notify-player';
+import { makeJoinQuizCommand } from './join-quiz';
+import { makeLeaveQuizCommand } from './leave-quiz';
 import { makeNotifyPlayers } from './notify-players';
 
 const notifyPlayers = makeNotifyPlayers({ connectionDb, WSClient });
-const notifyPlayer = makeNotifyPlayer({ WSClient });
-const joinQuiz = makeJoinQuiz({ connectionDb, notifyPlayers });
-const leaveQuiz = makeLeaveQuiz({ connectionDb, notifyPlayers });
+const JoinQuizCommand = makeJoinQuizCommand({ connectionDb, notifyPlayers });
+const LeaveQuizCommand = makeLeaveQuizCommand({ connectionDb, notifyPlayers });
 
-export { joinQuiz, leaveQuiz, notifyPlayers, notifyPlayer };
+export { JoinQuizCommand, LeaveQuizCommand, notifyPlayers };

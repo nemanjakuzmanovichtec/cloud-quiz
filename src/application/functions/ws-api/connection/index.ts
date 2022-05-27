@@ -13,14 +13,17 @@ import { handlerPath } from '@application/helpers/handler-resolver';
 export const connectionHandler: LambdaFunctionWithIam = {
   handler: `${handlerPath(__dirname)}/handler.main`,
   events: [
-    { websocket: { route: '$connect' } },
-    { websocket: { route: '$disconnect' } },
-  ],
-  iamRoleStatements: [
     {
-      Effect: 'Allow',
-      Action: ['dynamodb:PutItem', 'dynamodb:DeleteItem'],
-      Resource: { 'Fn::GetAtt': ['ConnectionsTable', 'Arn'] },
+      websocket: {
+        route: '$connect',
+        routeResponseSelectionExpression: '$default',
+      },
+    },
+    {
+      websocket: {
+        route: '$disconnect',
+        routeResponseSelectionExpression: '$default',
+      },
     },
   ],
 };

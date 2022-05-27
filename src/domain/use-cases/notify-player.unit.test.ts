@@ -2,13 +2,12 @@ import { mock, MockProxy } from 'jest-mock-extended';
 import { IWSClient } from '@infrastructure/websocket/types';
 
 import { makeNotifyPlayer } from './notify-player';
-import { notifyPlayer } from '.';
 
 describe('notify a player', () => {
   let WSClientMock: MockProxy<IWSClient>;
 
   // System under test
-  let sut: typeof notifyPlayer;
+  let sut;
 
   beforeEach(() => {
     WSClientMock = mock<IWSClient>();
